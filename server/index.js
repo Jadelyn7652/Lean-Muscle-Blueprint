@@ -16,9 +16,18 @@ const PORT = process.env.PORT || 3001;
 // Security headers
 app.use(helmet());
 
-// CORS — only allow the frontend origin
-const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').trim();
-app.use(cors({ origin: clientUrl }));
+// CORS — allow frontend origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://lean-muscle-blueprint-production-f378.up.railway.app',
+  process.env.CLIENT_URL ? process.env.CLIENT_URL.trim() : null,
+].filter(Boolean);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) callback(null, true);
+    else callback(new Error('Not allowed by CORS'));
+  },
+}));
 
 // Global rate limit — 100 requests per 15 minutes per IP
 app.use(rateLimit({
