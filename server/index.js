@@ -17,7 +17,8 @@ const PORT = process.env.PORT || 3001;
 app.use(helmet());
 
 // CORS — only allow the frontend origin
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').trim();
+app.use(cors({ origin: clientUrl }));
 
 // Global rate limit — 100 requests per 15 minutes per IP
 app.use(rateLimit({
