@@ -2,6 +2,10 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
+  // Clear existing data to prevent duplicates on re-run
+  await prisma.lesson.deleteMany();
+  await prisma.course.deleteMany();
+
   const courses = [
     {
       title: 'Lean Muscle Blueprint: Phase 1',
