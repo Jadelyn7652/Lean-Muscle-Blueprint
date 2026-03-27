@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  NONE
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  ANNUAL
+}
+
+model User {
+  id                   Int                 @id @default(autoincrement())
+  email                String              @unique
+  passwordHash         String
+  name                 String
+  subscriptionStatus   SubscriptionStatus  @default(NONE)
+  subscriptionPlan     SubscriptionPlan?
+  subscriptionEndsAt   DateTime?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  enrollments          Enrollment[]
+  progress             Progress[]
+  createdAt            DateTime            @default(now())
+}
+
+model Course {
+  id           Int          @id @default(autoincrement())
+  title        String
+  description  String
+  category     String
+  thumbnailUrl String?
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+}
+
+model Lesson {
+  id       Int        @id @default(autoincrement())
+  courseId Int
+  course   Course     @relation(fields: [courseId], references: [id])
+  title    String
+  videoUrl String
+  order    Int
+  progress Progress[]
+}
+
+model Enrollment {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  courseId   Int
+  user       User     @relation(fields: [userId], references: [id])
+  course     Course   @relation(fields: [courseId], references: [id])
+  enrolledAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+model Progress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  lessonId    Int
+  user        User     @relation(fields: [userId], references: [id])
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+  completedAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+}
