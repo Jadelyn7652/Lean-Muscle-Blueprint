@@ -61,6 +61,14 @@ app.use('/api/lessons', lessonRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 
+// Serve React client in production
+const path = require('path');
+const clientDist = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
+
 // Global error handler — never leak stack traces to clients
 app.use((err, req, res, next) => {
   console.error(err);
