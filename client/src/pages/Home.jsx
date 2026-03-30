@@ -7,7 +7,7 @@ export default function Home() {
   const [featured, setFeatured] = useState([]);
 
   useEffect(() => {
-    api.get('/courses').then((r) => setFeatured(r.data.slice(0, 3))).catch(() => {});
+    api.get('/courses').then((r) => { if (Array.isArray(r.data)) setFeatured(r.data.slice(0, 3)); }).catch(() => {});
   }, []);
 
   return (
